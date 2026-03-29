@@ -16,23 +16,26 @@ function Contact() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    setLoading(true);
-    
-    await API.post("/contact", form);
 
-    toast.success("Message sent successfully!");
-
-    setForm({ name: "", email: "", message: "" });
     setLoading(true);
+    try {
+      await API.post("/contact", form);
+
+      toast.success("Message sent successfully!");
+
+      setForm({ name: "", email: "", message: "" });
+    } catch (error) {
+      toast.error("Something went wrong. Please try again!"); // ✅ User gets feedback
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <section className="py-20 text-center">
+    <section id="contact" className="py-20 text-center">
       <h2 className="mb-6 text-3xl font-bold">Contact Me</h2>
 
       <form onSubmit={handleSubmit} className="max-w-xl mx-auto space-y-4">
-
         <input
           type="text"
           name="name"
@@ -62,10 +65,13 @@ function Contact() {
           required
         />
 
-        <button className="px-6 py-2 bg-blue-500 rounded hover:bg-blue-600">
-          Send Message
+        <button
+          type="submit"
+          disabled={loading}
+          className="px-6 py-2 bg-blue-500 rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? "Sending.." : "Send Message"}
         </button>
-
       </form>
     </section>
   );
