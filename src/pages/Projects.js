@@ -11,16 +11,25 @@ function Projects() {
   const filteredProjects =
     filter === "All"
       ? projects
-      : projects.filter((p) => p.techStack === filter);
+      : projects.filter(
+          (p) =>
+            p.techStack && p.techStack.toLowerCase() === filter.toLowerCase()
+        );
+
+  console.log("Filter:", filter);
 
   useEffect(() => {
     fetchProjects();
   }, []);
 
+  console.log("Filtered:", filteredProjects);
+
   const fetchProjects = async () => {
     const data = await getProjects();
     setProjects(data);
   };
+
+  console.log(projects);
 
   return (
     <section id="projects" className="py-16">
@@ -46,50 +55,53 @@ function Projects() {
       <motion.div
         variants={staggerContainer}
         initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
+        animate="visible"
+        viewport={{ once: true,amount: 0.2 }}
         className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
       >
-        {filteredProjects.map((project) => (
-          <motion.div
-            key={project.id}
-            variants={fadeInUp}
-            className="overflow-hidden transition duration-300 bg-gray-100 dark:bg-gray-900 rounded-xl hover:scale-105"
-          >
-            {/* ✅ IMAGE CONTAINER */}
-            <div className="w-full h-48 overflow-hidden">
-              <img
-                src={
-                  project.imageUrl
-                    ? `/images/${project.imageUrl}`
-                    : `/images/default.png`
-                }
-                alt={project.title}
-                className="object-cover w-full h-full"
-              />
-            </div>
+        {filteredProjects.length > 0 &&
+          filteredProjects.map((project) => (
+            <motion.div
+              key={project.id}
+              variants={fadeInUp}
+              initial="hidden"
+              animate="visible"
+              className="overflow-hidden transition duration-300 bg-gray-100 dark:bg-gray-900 rounded-xl hover:scale-105"
+            >
+              {/* ✅ IMAGE CONTAINER */}
+              <div className="w-full h-48 overflow-hidden">
+                <img
+                  src={
+                    project.imageUrl
+                      ? `/images/${project.imageUrl}`
+                      : `/images/default.png`
+                  }
+                  alt={project.title}
+                  className="object-cover w-full h-full"
+                />
+              </div>
 
-            {/* ✅ CONTENT */}
-            <div className="p-4">
-              <h3 className="text-xl font-semibold">{project.title}</h3>
+              {/* ✅ CONTENT */}
+              <div className="p-4">
+                <h3 className="text-xl font-semibold">{project.title}</h3>
 
-              <p className="mt-2 text-gray-600 dark:text-gray-400">
-                {project.description}
-              </p>
+                <p className="mt-2 text-gray-600 dark:text-gray-400">
+                  {project.description}
+                </p>
 
-              <a
-                href={project.projectUrl}
-                target="_blank"
-                className="inline-block mt-3 text-blue-400"
-              >
-                <FaExternalLinkAlt />
-              </a>
-              <a href={project.githubUrl} target="_blank">
-                <FaGithub />
-              </a>
-            </div>
-          </motion.div>
-        ))}
+                <a
+                  href={project.projectUrl}
+                  target="_blank"
+                  className="inline-block mt-3 text-blue-400"
+                >
+                  <FaExternalLinkAlt />
+                </a>
+                <a href={project.githubUrl} target="_blank">
+                  <FaGithub />
+                </a>
+              </div>
+            </motion.div>
+          ))}
       </motion.div>
     </section>
   );
