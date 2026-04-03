@@ -12,3 +12,52 @@ html {
 * {
   transition: background 0.3s ease, color 0.3s ease;
 }
+
+/* ─────────────────────────────────────────────────────────────
+   ✅ PRINT STYLES
+   @media print fires when user hits Ctrl+P or clicks Print
+   These styles OVERRIDE screen styles for the printed output
+   ───────────────────────────────────────────────────────────── */
+
+   @media print {
+ 
+    /* Hide everything marked no-print — buttons, navbar, etc. */
+    .no-print {
+      display: none !important;
+    }
+   
+    /* Force white background — dark mode shouldn't print dark */
+    body {
+      background: white !important;
+      color: black !important;
+    }
+   
+    /* Remove screen padding from print layout */
+    .resume-card {
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      padding: 0 !important;
+      max-width: 100% !important;
+    }
+   
+    /* Ensure links print in black — blue links look odd on paper */
+    a {
+      color: black !important;
+      text-decoration: none !important;
+    }
+   
+    /* Prevent awkward page breaks inside sections */
+    h2, h3 {
+      page-break-after: avoid;
+    }
+   
+    li, p {
+      page-break-inside: avoid;
+    }
+   
+    /* Standard A4 print margins */
+    @page {
+      margin: 1.5cm;
+      size: A4;
+    }
+  }

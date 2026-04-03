@@ -3,12 +3,14 @@ import { getProjects } from "../services/projectService";
 import { FaGithub, FaExternalLinkAlt } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { fadeInUp, staggerContainer } from "../animations/variants";
+import AIExplainerModal from "../components/AIExplainerModal"; // ✅ NEW
 
+// ─────────────────────────────────────────────────────────────
+// Skeleton Card — shown while API loads
+// ─────────────────────────────────────────────────────────────
 const SkeletonCard = () => (
   <div className="overflow-hidden bg-gray-100 dark:bg-gray-900 rounded-xl animate-pulse">
-    {/* Image placeholder */}
     <div className="w-full h-48 bg-gray-300 dark:bg-gray-700" />
-    {/* Content placeholders */}
     <div className="p-4 space-y-3">
       <div className="w-3/4 h-5 bg-gray-300 rounded dark:bg-gray-700" />
       <div className="w-full h-4 bg-gray-300 rounded dark:bg-gray-700" />
@@ -23,12 +25,13 @@ const SkeletonCard = () => (
 
 function Projects() {
   const [projects, setProjects] = useState([]);
-
-  // ✅ Step 3 — Added loading and error states
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const [filter, setFilter] = useState("All");
+
+  // ✅ NEW — which project's AI modal is open (null = closed)
+  // Stores the whole project object so modal has all its data
+  const [selectedProject, setSelectedProject] = useState(null);
 
   const filteredProjects =
     filter === "All"
@@ -37,42 +40,35 @@ function Projects() {
           p.techStack?.toLowerCase().includes(filter.toLowerCase())
         );
 
-  console.log("Filter:", filter);
-
   useEffect(() => {
     fetchProjects();
   }, []);
-
-  console.log("Filtered:", filteredProjects);
 
   const fetchProjects = async () => {
     try {
       const data = await getProjects();
       setProjects(data);
-    } catch (error) {
-      // ✅ Step 3 — Catch API errors and store in state
+    } catch (err) {
       setError("Failed to load projects. Please check your connection.");
     } finally {
-      // ✅ Step 3 — Always reset loading whether success or failure
       setLoading(false);
     }
   };
 
-  console.log(projects);
-
   return (
     <section id="projects" className="py-16">
       <h2 className="mb-10 text-3xl font-bold text-center">My Projects</h2>
+
       {/* Filter Buttons */}
-      <div className="flex justify-center gap-4 mb-8">
+      <div className="flex flex-wrap justify-center gap-4 mb-8">
         {["All", "React", ".NET", "FullStack"].map((tech) => (
           <button
             key={tech}
             onClick={() => setFilter(tech)}
-            className={`px-4 py-2 rounded ${
+            className={`px-4 py-2 rounded transition-colors duration-200 ${
               filter === tech
                 ? "bg-blue-500 text-white"
-                : "bg-gray-200 dark:bg-gray-800"
+                : "bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700"
             }`}
           >
             {tech}
@@ -80,7 +76,7 @@ function Projects() {
         ))}
       </div>
 
-      {/* ✅ Step 3 — Error State */}
+      {/* Error State */}
       {error && (
         <div className="py-16 text-center">
           <p className="text-lg text-red-400">{error}</p>
@@ -93,7 +89,7 @@ function Projects() {
         </div>
       )}
 
-      {/* ✨ Step 4 — Skeleton Loader: shown while loading */}
+      {/* Skeleton Loader */}
       {loading && !error && (
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((n) => (
@@ -102,7 +98,7 @@ function Projects() {
         </div>
       )}
 
-      {/* ✅ Step 3 — Empty State: shown when filter returns 0 results */}
+      {/* Empty State */}
       {!loading && !error && filteredProjects.length === 0 && (
         <div className="py-16 text-center">
           <p className="text-lg text-gray-400">
@@ -118,25 +114,22 @@ function Projects() {
         </div>
       )}
 
-      {/* ✅ GRID CONTAINER */}
-      {/* ✅ Project Grid — only shown when loaded, no error, and has results */}
+      {/* Projects Grid */}
       {!loading && !error && filteredProjects.length > 0 && (
         <motion.div
           variants={staggerContainer}
           initial="hidden"
-          animate="visible"
-          viewport={{ once: true, amount: 0.2 }}
+          whileInView="visible"
+          viewport={{ once: true }}
           className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
         >
           {filteredProjects.map((project) => (
             <motion.div
               key={project.id}
               variants={fadeInUp}
-              initial="hidden"
-              animate="visible"
               className="flex flex-col overflow-hidden transition duration-300 bg-gray-100 dark:bg-gray-900 rounded-xl hover:scale-105"
             >
-              {/* ✅ IMAGE CONTAINER */}
+              {/* Image */}
               <div className="w-full h-48 overflow-hidden">
                 <img
                   src={
@@ -149,7 +142,7 @@ function Projects() {
                 />
               </div>
 
-              {/* ✅ CONTENT */}
+              {/* Content */}
               <div className="flex flex-col flex-1 p-4">
                 <h3 className="text-xl font-semibold">{project.title}</h3>
 
@@ -157,17 +150,16 @@ function Projects() {
                   {project.description}
                 </p>
 
-                {/* ✨ Step 5 — Tech stack badge */}
+                {/* Tech Stack Badge */}
                 {project.techStack && (
                   <span className="inline-block px-2 py-1 mt-3 text-xs text-blue-500 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300 w-fit">
                     {project.techStack}
                   </span>
                 )}
 
-                {/* ✅ Step 1 Fix + Step 5 — Secure links with labels */}
-                <div className="flex gap-4 mt-4">
+                {/* Links Row */}
+                <div className="flex flex-wrap gap-4 mt-4">
                   {project.projectUrl && (
-                    // ✅ Step 1 — Added rel="noreferrer" to fix security vulnerability
                     <a
                       href={project.projectUrl}
                       target="_blank"
@@ -180,7 +172,6 @@ function Projects() {
                   )}
 
                   {project.githubUrl && (
-                    // ✅ Step 1 — Added rel="noreferrer" here too
                     <a
                       href={project.githubUrl}
                       target="_blank"
@@ -192,10 +183,33 @@ function Projects() {
                     </a>
                   )}
                 </div>
+
+                {/* ✅ NEW — AI Explain Button */}
+                {/* onClick stores the whole project in selectedProject state */}
+                {/* This triggers the modal to open with this project's data */}
+                <button
+                  onClick={() => setSelectedProject(project)}
+                  className="flex items-center justify-center w-full gap-2 px-4 py-2 mt-4 text-sm font-medium text-blue-400 transition-all duration-200 border border-dashed rounded-lg border-blue-400/50 hover:bg-blue-500/10 hover:border-blue-400 group"
+                >
+                  <span className="transition-transform duration-200 group-hover:scale-110">
+                    ✨
+                  </span>
+                  Explain with AI
+                </button>
               </div>
             </motion.div>
           ))}
         </motion.div>
+      )}
+
+      {/* ✅ AI EXPLAINER MODAL */}
+      {/* Only renders when selectedProject is not null */}
+      {/* onClose sets selectedProject back to null → modal disappears */}
+      {selectedProject && (
+        <AIExplainerModal
+          project={selectedProject}
+          onClose={() => setSelectedProject(null)}
+        />
       )}
     </section>
   );
