@@ -1,8 +1,9 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"; // ✅ NEW
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"; // ✅ NEW
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./routes/ProtectedRoute";
 
-// Page components
+// HomePage components
 import Resume from "./pages/Resume"; // ✅ NEW
-
 import About from "./components/About";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
@@ -18,6 +19,16 @@ import BlogPost from "./pages/BlogPost";
 import CoverLetter from "./pages/CoverLetter";
 import ChatAssistant from "./components/ChatAssistant";
 
+// // ── Admin Pages ───────────────────────────────────────────
+import Login from "./pages/admin/Login";
+import AdminLayout from "./components/admin/AdminLayout";
+import Dashboard from "./pages/admin/Dashboard";
+import AdminProjects from "./pages/admin/AdminProjects";
+import HeroEditor from "./pages/admin/HeroEditor";
+import ContactInbox from "./pages/admin/ContactInbox";
+import ResumeManager from "./pages/admin/ResumeManager";
+import AdminSkills from "./pages/admin/AdminSkills";
+
 // ─────────────────────────────────────────────────────────────
 // ✅ HomePage — extracted from App so Router can swap pages
 // Everything that was in App before now lives here
@@ -25,7 +36,6 @@ import ChatAssistant from "./components/ChatAssistant";
 function HomePage() {
   return (
     <>
-      <Toaster />
       <Navbar />
       <Hero />
       <About />
@@ -48,26 +58,52 @@ function HomePage() {
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* / → full portfolio homepage */}
-        <Route path="/" element={<HomePage />} />
-        {/* /resume → standalone resume page */}
-        <Route path="/resume" element={<Resume />} />
-        {/* Blog list — /blog */}
-        <Route path="/blog" element={<BlogList />} /> {/* ✅ NEW */}
-        {/* Individual post — /blog/why-i-love-react-hooks etc */}
-        <Route path="/blog/:slug" element={<BlogPost />} /> {/* ✅ NEW */}
-        <Route path="/cover-letter"  element={<CoverLetter />} /> {/* ✅ NEW */}
-      </Routes>
-      {/*
+    <AuthProvider>
+      <BrowserRouter>
+        <Toaster />
+        <Routes>
+          {/* / → full portfolio homepage */}
+          <Route index path="/" element={<HomePage />} />
+          {/* /resume → standalone resume page */}
+          <Route path="/resume" element={<Resume />} />
+          {/* Blog list — /blog */}
+          <Route path="/blog" element={<BlogList />} /> {/* ✅ NEW */}
+          {/* Individual post — /blog/why-i-love-react-hooks etc */}
+          <Route path="/blog/:slug" element={<BlogPost />} /> {/* ✅ NEW */}
+          <Route path="/cover-letter" element={<CoverLetter />} />
+          {/* ✅ NEW */}
+          {/* ── Admin Login (public) ── */}
+          <Route path="/admin/login" element={<Login />} />
+          {/* ── Admin Panel (protected) ── */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <AdminLayout />
+              </ProtectedRoute>
+            }
+          >
+            {/* /admin → go straight to dashboard */}
+            <Route index element={<Navigate to="/admin/dashboard" replace />} />
+ 
+            {/* These render inside AdminLayout's <Outlet /> */}
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="projects"  element={<AdminProjects />} />
+            <Route path="hero"      element={<HeroEditor />} />
+            <Route path="contacts"  element={<ContactInbox />} />
+            <Route path="resume"    element={<ResumeManager />} />
+            <Route path="skills"    element={<AdminSkills />} />
+          </Route>
+        </Routes>
+        {/*
         ✅ ChatAssistant lives OUTSIDE <Routes>
         This means it NEVER unmounts during navigation
         The chat stays open even when user visits /blog or /resume
         Same pattern used by Intercom, Crisp, and every support chat widget
       */}
-      <ChatAssistant />
-    </BrowserRouter>
+        <ChatAssistant />
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

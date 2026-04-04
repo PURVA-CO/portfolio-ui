@@ -4,6 +4,7 @@ import { fadeInUp } from "../animations/variants";
 import { FaGithub, FaLinkedinIn } from "react-icons/fa";
 import ParticleBackground from "./ParticleBackground"; // ✅ NEW
 import { Link } from "react-router-dom";
+import API from "../services/api";
 
 const roles = [
   "Full Stack Developer",
@@ -14,12 +15,26 @@ const roles = [
 
 function Hero() {
   const [roleIndex, setRoleIndex] = useState(0);
+  const [hero, setHero] = useState({
+    name: "Purva Mehta",
+    tagline: "Full Stack Developer",
+    subTagline:
+      "I build scalable web applications using React and .NET Core. Passionate about clean code and modern UI.",
+  });
 
   useEffect(() => {
     const interval = setInterval(() => {
       setRoleIndex((prev) => (prev + 1) % roles.length);
     }, 2000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    API.get("/hero")
+      .then((res) => {
+        if (res.data) setHero(res.data);
+      })
+      .catch(() => {}); // falls back to default above
   }, []);
 
   const scrollTo = (id) => {
@@ -41,7 +56,7 @@ function Hero() {
           animate="visible"
           className="text-5xl font-bold"
         >
-          Hi, I'm <span className="text-blue-400">Purva Mehta</span>
+          Hi, I'm <span className="text-blue-400">{hero.name}</span>
         </motion.h1>
 
         {/* Cycling role */}
@@ -74,8 +89,16 @@ function Hero() {
           transition={{ ...fadeInUp.visible?.transition, delay: 0.5 }}
           className="max-w-xl mx-auto mt-6 text-gray-600 dark:text-gray-400"
         >
-          I build scalable web applications using React and .NET Core.
-          Passionate about clean code and modern UI.
+          {hero.tagline}
+        </motion.p>
+        <motion.p
+          variants={fadeInUp}
+          initial="hidden"
+          animate="visible"
+          transition={{ ...fadeInUp.visible?.transition, delay: 0.5 }}
+          className="max-w-xl mx-auto mt-1 text-gray-600 dark:text-gray-400"
+        >
+          {hero.subTagline}
         </motion.p>
 
         {/* Social Links */}
