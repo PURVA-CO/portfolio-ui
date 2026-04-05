@@ -8,6 +8,7 @@ import {
   MdDescription,
   MdCode,
   MdLogout,
+  MdArticle,
 } from "react-icons/md";
 
 const navItems = [
@@ -17,6 +18,7 @@ const navItems = [
   { to: "/admin/contacts",   label: "Inbox",       icon: <MdMail size={20} /> },
   { to: "/admin/resume",     label: "Resume",      icon: <MdDescription size={20} /> },
   { to: "/admin/skills",     label: "Skills",      icon: <MdCode size={20} /> },
+  { to: "/admin/blog",      label: "Blog",        icon: <MdArticle size={20} /> }, // ✅ NEW
 ];
 
 function Sidebar() {

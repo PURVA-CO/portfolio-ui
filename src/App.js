@@ -28,6 +28,7 @@ import HeroEditor from "./pages/admin/HeroEditor";
 import ContactInbox from "./pages/admin/ContactInbox";
 import ResumeManager from "./pages/admin/ResumeManager";
 import AdminSkills from "./pages/admin/AdminSkills";
+import AdminBlog from "./pages/admin/AdminBlog";
 
 // ─────────────────────────────────────────────────────────────
 // ✅ HomePage — extracted from App so Router can swap pages
@@ -93,6 +94,7 @@ function App() {
             <Route path="contacts"  element={<ContactInbox />} />
             <Route path="resume"    element={<ResumeManager />} />
             <Route path="skills"    element={<AdminSkills />} />
+            <Route path="blog"      element={<AdminBlog />} />  {/* ✅ NEW */}
           </Route>
         </Routes>
         {/*

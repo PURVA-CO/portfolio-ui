@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState,useEffect } from "react";
 import { useInView, motion, AnimatePresence } from "framer-motion";
 import {
   RadarChart,
@@ -10,6 +10,7 @@ import {
   Tooltip,
 } from "recharts";
 import { fadeInUp, staggerContainer } from "../animations/variants";
+import API from "../services/api";
 
 // ─────────────────────────────────────────────────────────────
 // ✅ DATA — Edit this to match YOUR actual skill levels (0-100)
@@ -17,33 +18,33 @@ import { fadeInUp, staggerContainer } from "../animations/variants";
 // ─────────────────────────────────────────────────────────────
 const skillsData = {
   Frontend: [
-    { skill: "React",          value: 90 },
-    { skill: "JavaScript",     value: 85 },
-    { skill: "Tailwind CSS",   value: 80 },
-    { skill: "Framer Motion",  value: 65 },
-    { skill: "HTML & CSS",     value: 90 },
+    { skill: "React", value: 90 },
+    { skill: "JavaScript", value: 85 },
+    { skill: "Tailwind CSS", value: 80 },
+    { skill: "Framer Motion", value: 65 },
+    { skill: "HTML & CSS", value: 90 },
   ],
   Backend: [
-    { skill: "ASP.NET Core",   value: 85 },
-    { skill: "C#",             value: 88 },
-    { skill: "REST APIs",      value: 85 },
-    { skill: "SQL Server",     value: 78 },
-    { skill: "Entity Framework",value: 75 },
+    { skill: "ASP.NET Core", value: 85 },
+    { skill: "C#", value: 88 },
+    { skill: "REST APIs", value: 85 },
+    { skill: "SQL Server", value: 78 },
+    { skill: "Entity Framework", value: 75 },
   ],
   Tools: [
-    { skill: "Git & GitHub",   value: 85 },
-    { skill: "VS Code",        value: 90 },
-    { skill: "Postman",        value: 80 },
-    { skill: "Azure",          value: 50 },
-    { skill: "Figma",          value: 60 },
+    { skill: "Git & GitHub", value: 85 },
+    { skill: "VS Code", value: 90 },
+    { skill: "Postman", value: 80 },
+    { skill: "Azure", value: 50 },
+    { skill: "Figma", value: 60 },
   ],
   Soft: [
-    { skill: "Problem Solving",value: 90 },
-    { skill: "Teamwork",       value: 88 },
-    { skill: "Communication",  value: 80 },
-    { skill: "Self Learning",  value: 95 },
-    { skill: "Adaptability",   value: 85 },
-    { skill: "Time Mgmt",      value: 78 },
+    { skill: "Problem Solving", value: 90 },
+    { skill: "Teamwork", value: 88 },
+    { skill: "Communication", value: 80 },
+    { skill: "Self Learning", value: 95 },
+    { skill: "Adaptability", value: 85 },
+    { skill: "Time Mgmt", value: 78 },
   ],
 };
 
@@ -52,9 +53,9 @@ const skillsData = {
 // ─────────────────────────────────────────────────────────────
 const tabIcons = {
   Frontend: "⚛️",
-  Backend:  "⚙️",
-  Tools:    "🛠️",
-  Soft:     "🧠",
+  Backend: "⚙️",
+  Tools: "🛠️",
+  Soft: "🧠",
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -65,7 +66,9 @@ const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     return (
       <div className="px-3 py-2 text-sm bg-gray-900 border rounded-lg shadow-xl border-blue-500/30">
-        <p className="font-semibold text-blue-400">{payload[0].payload.skill}</p>
+        <p className="font-semibold text-blue-400">
+          {payload[0].payload.skill}
+        </p>
         <p className="text-white">{payload[0].value}%</p>
       </div>
     );
@@ -85,9 +88,7 @@ const SkillBar = ({ skill, value, index, isInView }) => (
       <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
         {skill}
       </span>
-      <span className="text-sm font-semibold text-blue-400">
-        {value}%
-      </span>
+      <span className="text-sm font-semibold text-blue-400">{value}%</span>
     </div>
 
     {/* Bar Track */}
@@ -119,9 +120,43 @@ function Skills() {
   // ✅ once: true — bars only animate in once
   const isInView = useInView(sectionRef, { once: true, margin: "-80px" });
 
+  const [skills, setSkills] = useState([]);
+
+  useEffect(() => {
+    API.get("/skills")
+      .then((res) => setSkills(res.data))
+      .catch(() => {
+        // Fallback to static if API not ready
+        setSkills([
+          { id: 1, name: "React", proficiencyLevel: 90, category: "Frontend" },
+          {
+            id: 2,
+            name: ".NET Core",
+            proficiencyLevel: 85,
+            category: "Backend",
+          },
+          { id: 3, name: "C#", proficiencyLevel: 85, category: "Backend" },
+          { id: 4, name: "SQL", proficiencyLevel: 75, category: "Database" },
+          {
+            id: 5,
+            name: "JavaScript",
+            proficiencyLevel: 88,
+            category: "Frontend",
+          },
+        ]);
+      });
+  }, []);
+
+  // Group by category
+  const grouped = skills.reduce((acc, skill) => {
+    const cat = skill.category || "Other";
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(skill);
+    return acc;
+  }, {});
+
   return (
     <section className="py-20 bg-white dark:bg-gray-950">
-
       {/* ── Section Header ── */}
       <motion.div
         variants={staggerContainer}
@@ -146,7 +181,6 @@ function Skills() {
       </motion.div>
 
       <div className="max-w-5xl px-4 mx-auto" ref={sectionRef}>
-
         {/* ── Tab Buttons ── */}
         <div className="flex flex-wrap justify-center gap-2 mb-10">
           {Object.keys(skillsData).map((tab) => (
@@ -156,9 +190,10 @@ function Skills() {
               className={`
                 flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium
                 transition-all duration-200 border
-                ${activeTab === tab
-                  ? "bg-blue-500 text-white border-blue-500 shadow-lg shadow-blue-500/25"
-                  : "bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-800 hover:border-blue-400"
+                ${
+                  activeTab === tab
+                    ? "bg-blue-500 text-white border-blue-500 shadow-lg shadow-blue-500/25"
+                    : "bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-800 hover:border-blue-400"
                 }
               `}
             >
@@ -179,12 +214,13 @@ function Skills() {
             transition={{ duration: 0.25 }}
             className="grid items-center grid-cols-1 gap-10 md:grid-cols-2"
           >
-
             {/* ── LEFT: Radar Chart ── */}
             <div className="w-full h-72 md:h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <RadarChart data={currentSkills} margin={{ top: 10, right: 20, bottom: 10, left: 20 }}>
-
+                <RadarChart
+                  data={currentSkills}
+                  margin={{ top: 10, right: 20, bottom: 10, left: 20 }}
+                >
                   {/* Web grid lines */}
                   <PolarGrid
                     stroke="#e5e7eb"
@@ -222,7 +258,6 @@ function Skills() {
 
                   {/* Hover tooltip */}
                   <Tooltip content={<CustomTooltip />} />
-
                 </RadarChart>
               </ResponsiveContainer>
             </div>
@@ -239,7 +274,6 @@ function Skills() {
                 />
               ))}
             </div>
-
           </motion.div>
         </AnimatePresence>
 
@@ -247,7 +281,6 @@ function Skills() {
         <p className="mt-10 text-xs text-center text-gray-400 dark:text-gray-600">
           Values reflect personal assessment of proficiency • Always learning 🚀
         </p>
-
       </div>
     </section>
   );

@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import API from "../services/api";
 import { blogPosts } from "../data/blogPosts";
 import { fadeInUp, staggerContainer } from "../animations/variants";
 
@@ -66,11 +68,45 @@ function BlogPost() {
   const { slug } = useParams(); // ✅ reads :slug from the URL
   const navigate = useNavigate();
 
+  const [post, setPost] = useState(null);
+  const [allPosts, setAllPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch this specific post by slug
+        const [postRes, allRes] = await Promise.all([
+          API.get(`/blog/slug/${slug}`),
+          API.get("/blog"),
+        ]);
+        setPost(postRes.data);
+        setAllPosts(allRes.data);
+      } catch {
+        setNotFound(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [slug]);
+
+  // ── Loading state ────────────────────────────────────────
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-950">
+        <div className="w-8 h-8 border-2 border-blue-400 rounded-full border-t-transparent animate-spin" />
+      </div>
+    );
+  }
+ 
+
   // Find post matching the slug
-  const post = blogPosts.find((p) => p.slug === slug);
+  //const post = blogPosts.find((p) => p.slug === slug);
 
   // ✅ Guard clause — always handle "not found"
-  if (!post) {
+  if ( notFound || !post) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen px-4 text-center bg-gray-50 dark:bg-gray-950">
         <p className="mb-4 text-6xl">📭</p>
@@ -90,9 +126,9 @@ function BlogPost() {
   }
 
   // Also find prev/next posts for navigation
-  const currentIndex = blogPosts.findIndex((p) => p.slug === slug);
-  const prevPost = blogPosts[currentIndex + 1] || null;
-  const nextPost = blogPosts[currentIndex - 1] || null;
+  const currentIndex = allPosts.findIndex((p) => p.slug === slug);
+  const prevPost = allPosts[currentIndex + 1] || null;
+  const nextPost = allPosts[currentIndex - 1] || null;
 
   return (
     <div className="min-h-screen px-4 py-16 bg-gray-50 dark:bg-gray-950">
