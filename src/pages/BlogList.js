@@ -6,7 +6,7 @@ import { fadeInUp, staggerContainer } from "../animations/variants";
 import API from "../services/api";
 
 // All unique tags from posts + "All"
-const allTags = ["All", ...new Set(blogPosts.map((p) => p.tag))];
+//const allTags = ["All", ...new Set(blogPosts.map((p) => p.tag))];
 
 const splitTags = (tagString) =>
   tagString
@@ -21,6 +21,8 @@ function BlogList() {
   const [filter, setFilter] = useState("All");
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  //const allTags = ["All", ...new Set(blogPosts.map((p) => p.tag))];
 
   // ✅ Fetch published posts from API
   useEffect(() => {

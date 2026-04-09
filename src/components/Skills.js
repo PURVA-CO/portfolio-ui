@@ -148,12 +148,12 @@ function Skills() {
   }, []);
 
   // Group by category
-  const grouped = skills.reduce((acc, skill) => {
-    const cat = skill.category || "Other";
-    if (!acc[cat]) acc[cat] = [];
-    acc[cat].push(skill);
-    return acc;
-  }, {});
+  // const grouped = skills.reduce((acc, skill) => {
+  //   const cat = skill.category || "Other";
+  //   if (!acc[cat]) acc[cat] = [];
+  //   acc[cat].push(skill);
+  //   return acc;
+  // }, {});
 
   return (
     <section className="py-20 bg-white dark:bg-gray-950">

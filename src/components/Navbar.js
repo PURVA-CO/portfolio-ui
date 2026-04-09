@@ -16,9 +16,15 @@ function Navbar() {
 
         {/* RIGHT SIDE (Menu + Toggle) */}
         <div className="flex items-center gap-6 text-gray-300">
-          <a href="#" className="hover:text-blue-400">
+          {/* <a href="#" className="hover:text-blue-400">
             Home
-          </a>
+          </a> */}
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="hover:text-blue-400"
+          >
+            Home
+          </button>
 
           <a href="#projects" className="hover:text-blue-400">
             Projects
@@ -27,10 +33,7 @@ function Navbar() {
           <a href="#contact" className="hover:text-blue-400">
             Contact
           </a>
-          <Link
-            to="/blog"
-            className="hover:text-blue-400"
-          >
+          <Link to="/blog" className="hover:text-blue-400">
             Blog
           </Link>
 
