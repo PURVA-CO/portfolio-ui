@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+const API_BASE =
+  process.env.REACT_APP_API_URL?.replace("/api", "") ||
+  "https://localhost:7000";
+
 function AIExplainerModal({ project, onClose }) {
   const [explanation, setExplanation] = useState("");
   const [loading, setLoading] = useState(true);
@@ -44,7 +48,13 @@ Rules:
 
       // ✅ Call YOUR .NET proxy — not Anthropic directly
       // Change this URL to match your .NET API port
-      const response = await fetch("https://localhost:7000/api/ai/explain", {
+      // const response = await fetch("https://localhost:7000/api/ai/explain", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({ prompt }),
+      // });
+
+      const response = await fetch(`${API_BASE}/api/ai/explain`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt }),
@@ -143,14 +153,20 @@ Rules:
   // ─────────────────────────────────────────────────────────
   const explainProjectFallback = async (prompt) => {
     try {
-      const response = await fetch(
-        "https://localhost:7000/api/ai/explain-simple",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt }),
-        }
-      );
+      // const response = await fetch(
+      //   "https://localhost:7000/api/ai/explain-simple",
+      //   {
+      //     method: "POST",
+      //     headers: { "Content-Type": "application/json" },
+      //     body: JSON.stringify({ prompt }),
+      //   }
+      // );
+
+      const response = await fetch(`${API_BASE}/api/ai/explain-simple`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
 
       if (!response.ok)
         throw new Error(`Fallback API error: ${response.status}`);

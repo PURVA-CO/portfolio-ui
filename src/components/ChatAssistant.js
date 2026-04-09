@@ -1,11 +1,16 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+
+const API_BASE = process.env.REACT_APP_API_URL?.replace("/api", "")
+    || "https://localhost:7000";
+
 // ─────────────────────────────────────────────────────────────
 // ✅ SYSTEM PROMPT — Claude's identity and knowledge
 // This is invisible to visitors but shapes every single reply
 // Update this with YOUR real information
 // ─────────────────────────────────────────────────────────────
+
 const SYSTEM_PROMPT = `You are an AI assistant representing Purva Mehta's developer portfolio.
 You speak in first person AS Purva — use "I", "my", "I've built" etc.
 
@@ -130,16 +135,25 @@ function ChatAssistant() {
     try {
       // ✅ Send FULL history + system prompt to .NET proxy
       // Claude reads entire history = understands context of conversation
-      const response = await fetch("https://localhost:7000/api/ai/chat", {
-        method: "POST",
+      // const response = await fetch("https://localhost:7000/api/ai/chat", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({
+      //     systemPrompt: SYSTEM_PROMPT,
+      //     // ✅ Only send role + content — no extra fields
+      //     messages: newHistory.map((m) => ({
+      //       role: m.role,
+      //       content: m.content,
+      //     })),
+      //   }),
+      // });
+
+      const response = await fetch(`${API_BASE}/api/ai/chat`, {
+        method:  "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           systemPrompt: SYSTEM_PROMPT,
-          // ✅ Only send role + content — no extra fields
-          messages: newHistory.map((m) => ({
-            role: m.role,
-            content: m.content,
-          })),
+          messages: newHistory.map((m) => ({ role: m.role, content: m.content })),
         }),
       });
 
