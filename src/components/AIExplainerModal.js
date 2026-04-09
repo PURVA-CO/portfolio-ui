@@ -10,9 +10,9 @@ function AIExplainerModal({ project, onClose }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // useEffect(() => {
-  //   explainProject();
-  // }, []);
+  useEffect(() => {
+    explainProject();
+  }, []);
 
   // Close on Escape key
   useEffect(() => {
@@ -162,13 +162,7 @@ Rules:
       //   }
       // );
 
-      // ✅ Fix — add eslint-disable comment for this specific line
-      // This is the standard React pattern for "run once on mount"
-      useEffect(() => {
-        explainProject();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, []);
-
+      
       const response = await fetch(`${API_BASE}/api/ai/explain-simple`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
