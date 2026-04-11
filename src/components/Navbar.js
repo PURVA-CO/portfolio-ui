@@ -102,7 +102,7 @@ function Navbar() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="text-xl font-bold text-blue-400">
-            MyPortfolio
+            PM Dev Studio
           </Link>
 
           {/* ── DESKTOP NAV (md and above) ── */}
@@ -130,6 +130,12 @@ function Navbar() {
               className="transition-colors duration-200 hover:text-blue-400"
             >
               Blog
+            </Link>
+            <Link
+              to="/cover-letter"
+              className="transition-colors duration-200 hover:text-blue-400"
+            >
+              Cover Letter
             </Link>
 
             {/* Availability Badge */}
